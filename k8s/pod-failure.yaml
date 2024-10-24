@@ -1,0 +1,12 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-failure-example
+  namespace: dev
+spec:
+  action: pod-failure
+  mode: one
+  duration: '120s'
+  selector:
+    labelSelectors:
+      'app.kubernetes.io/name': 'helm'

@@ -3,6 +3,9 @@ package me.amiralles.springbootocpclient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -28,5 +31,10 @@ public class OpenShiftClientController {
     @GetMapping("/podsWithPrefix")
     public List<String> getPodsWithPrefix(@RequestParam String namespace, @RequestParam String prefix) {
         return openShiftClientService.getPodsWithPrefix(namespace, prefix);
+    }
+
+    @GetMapping("/podFailure")
+    public void podFailure(@RequestParam String namespace) throws IOException {
+        openShiftClientService.podFailure(namespace);
     }
 }

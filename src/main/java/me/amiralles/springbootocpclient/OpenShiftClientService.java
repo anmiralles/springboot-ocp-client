@@ -1,10 +1,17 @@
 package me.amiralles.springbootocpclient;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,5 +73,14 @@ public class OpenShiftClientService {
         } catch (KubernetesClientException e) {
             throw new RuntimeException("Error fetching pods: " + e.getMessage(), e);
         }
+    }
+
+    public void podFailure(String namespace) throws IOException {
+        // Load Yaml into Kubernetes resources
+        File file = new File(String.valueOf(ResourceUtils.getFile("k8s/pod-failure.yaml")));
+        List<HasMetadata> result = kubernetesClient.load(new FileInputStream(file)).items();
+
+        // Apply Kubernetes Resources
+        kubernetesClient.resourceList(result).inNamespace(namespace).createOrReplace();
     }
 }
