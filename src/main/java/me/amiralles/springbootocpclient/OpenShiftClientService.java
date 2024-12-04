@@ -9,9 +9,7 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +29,11 @@ public class OpenShiftClientService {
             PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
 
             // Extract the pod names
-            List<String> podNames = podList.getItems()
+
+            return podList.getItems()
                     .stream()
                     .map(pod -> pod.getMetadata().getName())
                     .collect(Collectors.toList());
-
-            return podNames;
 
         } catch (KubernetesClientException e) {
             throw new RuntimeException("Error fetching pods: " + e.getMessage(), e);
@@ -63,12 +60,12 @@ public class OpenShiftClientService {
             PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
 
             // Filter pod names by the prefix and collect them into a list
-            List<String> podNames = podList.getItems().stream()
+            // Filter by prefix
+
+            return podList.getItems().stream()
                     .map(pod -> pod.getMetadata().getName())
                     .filter(podName -> podName.startsWith(prefix)) // Filter by prefix
                     .collect(Collectors.toList());
-
-            return podNames;
 
         } catch (KubernetesClientException e) {
             throw new RuntimeException("Error fetching pods: " + e.getMessage(), e);
@@ -81,6 +78,6 @@ public class OpenShiftClientService {
         List<HasMetadata> result = kubernetesClient.load(new FileInputStream(file)).items();
 
         // Apply Kubernetes Resources
-        kubernetesClient.resourceList(result).inNamespace(namespace).createOrReplace();
+        kubernetesClient.resourceList(result).inNamespace(namespace).serverSideApply();
     }
 }
